@@ -1,0 +1,21 @@
+from xmlrpc import client as xmlrpc_client
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+url = os.getenv("URL")
+db = os.getenv("DB")
+username = os.getenv("USER")
+password = os.getenv("PASSWORD")
+
+#Connect Odoo authentication service
+common = xmlrpc_client.ServerProxy(f"{url}/xmlrpc/2/common")
+
+uid = common.authenticate(db, username, password, {})
+
+if uid:
+    print("Authentication successful.")
+    print(f"Authenticated User ID: {uid}")
+else:
+    print("Authentication failed. Please check your credentials or database name.")

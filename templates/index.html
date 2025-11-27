@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odoo Product Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+    <div class="container mt-5">
+        <h1 class="mb-4 text-primary">Odoo Product Cost Updater</h1>
+        
+        <div class="card shadow">
+            <div class="card-body">
+                <table class="table table-hover table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>SKU (Ref)</th>
+                            <th>Product Name</th>
+                            <th>Current Cost</th>
+                            <th>New Cost</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td>{{ product.id }}</td>
+                            <td>{{ product.default_code or '-' }}</td>
+                            <td>{{ product.name }}</td>
+                            <td>
+                                <span class="badge bg-info text-dark">
+                                    ${{ product.standard_price }}
+                                </span>
+                            </td>
+                            <td>
+                                <input type="number" 
+                                       class="form-control form-control-sm" 
+                                       step="0.01"
+                                       min="0" 
+                                       id="cost-{{ product.id }}"
+                                       placeholder="New Price">
+                            </td>
+                            <td>
+                                <button class="btn btn-success btn-sm update-btn" 
+                                        data-product-id="{{ product.id }}">
+                                    Update
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.update-btn').forEach((button) => {
+                button.addEventListener('click', () => {
+                    const productId = button.dataset.productId;
+                    updateCost(productId);
+                });
+            });
+        });
+
+        function updateCost(productId) {
+            const input = document.getElementById(`cost-${productId}`);
+            const newPrice = input ? input.value : '';
+
+            if (!newPrice) {
+                alert('Please enter a new price first.');
+                return;
+            }
+
+            alert(`Coming soon! ID: ${productId}, New Price: ${newPrice}`);
+        }
+    </script>
+
+</body>
+</html>

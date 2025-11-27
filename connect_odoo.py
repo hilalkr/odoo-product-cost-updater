@@ -18,6 +18,7 @@ if uid:
     print("Authentication successful.")
     print(f"Authenticated User ID: {uid}")
 
+#Connect to object service 
     models = xmlrpc_client.ServerProxy(f"{url}/xmlrpc/2/object")
     products = models.execute_kw(
         db, uid, password,
@@ -25,7 +26,7 @@ if uid:
         'search_read',      
         [[]],               
         {
-            'fields': ['name', 'standard_price', 'id'],
+            'fields': ['name', 'standard_price', 'id'], 
             'limit' :5
         }
     )

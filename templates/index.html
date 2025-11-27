@@ -57,28 +57,56 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.update-btn').forEach((button) => {
-                button.addEventListener('click', () => {
-                    const productId = button.dataset.productId;
-                    updateCost(productId);
-                });
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.update-btn').forEach((button) => {
+            button.addEventListener('click', () => {
+                const productId = button.dataset.productId;
+                updateCost(productId);
             });
         });
+    });
 
-        function updateCost(productId) {
-            const input = document.getElementById(`cost-${productId}`);
-            const newPrice = input ? input.value : '';
+    async function updateCost(productId) {
+        const inputField = document.getElementById(`cost-${productId}`);
+        const newPrice = inputField.value;
 
-            if (!newPrice) {
-                alert('Please enter a new price first.');
-                return;
+        if (!newPrice) {
+            alert("Please enter a new price.");
+            return;
+        }
+
+        if (!confirm(`Update the price for ID ${productId} to ${newPrice}?`)) {
+            return;
+        }
+
+        try {
+            const response = await fetch('/update_cost', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    product_id: parseInt(productId),
+                    new_cost: parseFloat(newPrice)
+                }),
+            });
+
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                alert("Success! Price updated.");
+                location.reload(); 
+            } else {
+                alert("Error: " + result.message);
             }
 
-            alert(`Coming soon! ID: ${productId}, New Price: ${newPrice}`);
+        } catch (error) {
+            console.error('Error:', error);
+            alert("An error occurred while connecting to the server.");
         }
-    </script>
+    }
+</script>
 
 </body>
 </html>

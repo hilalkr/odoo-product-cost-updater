@@ -1,70 +1,42 @@
 from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
-import xmlrpc.client
-import os
+from schemas import UpdateCostRequest
+from services import fetch_products_from_odoo, update_product_cost_in_odoo
 from dotenv import load_dotenv
 
 load_dotenv()
-
-URL = os.getenv("URL")
-DB = os.getenv("DB")
-USER = os.getenv("USER")
-PASSWORD = os.getenv("PASSWORD")
 
 app = FastAPI()
 
 templates = Jinja2Templates(directory="templates")
 
-def get_odoo_connection():
-    common = xmlrpc.client.ServerProxy(f'{URL}/xmlrpc/2/common')
-    uid = common.authenticate(DB, USER, PASSWORD, {})
-    
-    if not uid:
-        raise Exception("Odoo Authentication Failed")
-        
-    models = xmlrpc.client.ServerProxy(f'{URL}/xmlrpc/2/object')
-    
-    return models, uid
 
-@app.get("/") 
+
+@app.get("/")
 def dashboard(request: Request):
     try:
-        models, uid = get_odoo_connection()
-        products = models.execute_kw(
-            DB, uid, PASSWORD,
-            'product.product', 'search_read', [[]],
-            {
-                'fields': ['name', 'standard_price', 'default_code', 'id'], 
-                'limit': 20
-            }
-        )
+        products = fetch_products_from_odoo()
         
         return templates.TemplateResponse("index.html", {
             "request": request, 
             "products": products
         })
-
     except Exception as e:
         return {"status": "error", "message": str(e)}
-    
-@app.get("/products")
-def fetch_products():
+
+
+@app.post("/update_cost")
+def update_cost(data: UpdateCostRequest):
     try:
-        models, uid = get_odoo_connection()
+        if data.new_cost < 0:
+            return {"status": "error", "message": "Cost cannot be negative!"}
 
-        products = models.execute_kw(
-            DB, uid, PASSWORD,
-            'product.product',  
-            'search_read',      
-            [[]],               
-            {
-                'fields': ['name', 'standard_price', 'default_code', 'id'], # Internal reference / SKU = default_code
-                'limit': 20  
-            }
-        )
-                
+        success = update_product_cost_in_odoo(data.product_id, data.new_cost)
 
-        return {"status": "success", "data": products}
+        if success:
+            return {"status": "success", "message": "Price updated successfully!"}
+        else:
+            return {"status": "error", "message": "Update failed in Odoo."}
 
     except Exception as e:
         return {"status": "error", "message": str(e)}

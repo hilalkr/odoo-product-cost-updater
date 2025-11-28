@@ -30,7 +30,7 @@ Simple FastAPI app that connects to Odoo 16 Community Edition via XML-RPC to lis
 ### 1) Clone
 
 ```bash
-git clone <repository-url>
+git clone <https://github.com/hilalkr/odoo-product-cost-updater>
 cd odoo-app
 ```
 

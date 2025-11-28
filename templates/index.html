@@ -32,7 +32,7 @@
                             <td>{{ product.name }}</td>
                             <td>
                                 <span class="badge bg-info text-dark">
-                                    ${{ product.standard_price }}
+                                    ${{ "{:,.2f}".format(product.standard_price or 0) }}
                                 </span>
                             </td>
                             <td>
@@ -75,6 +75,10 @@
             alert("Please enter a new price.");
             return;
         }
+        if (parseFloat(newPrice) < 0) {
+            alert("Cost cannot be negative!");
+            return;
+        }
 
         if (!confirm(`Update the price for ID ${productId} to ${newPrice}?`)) {
             return;
@@ -98,7 +102,7 @@
                 alert("Success! Price updated.");
                 location.reload(); 
             } else {
-                alert("Error: " + result.message);
+                alert("Error: " + result.detail);
             }
 
         } catch (error) {

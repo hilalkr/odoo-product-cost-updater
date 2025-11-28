@@ -3,7 +3,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-URL = os.getenv("URL")
-DB = os.getenv("DB")
-USER = os.getenv("USER")
-PASSWORD = os.getenv("PASSWORD")
+ODOO_URL = os.getenv("ODOO_URL")
+ODOO_DB = os.getenv("ODOO_DB")
+ODOO_USER = os.getenv("ODOO_USER")
+ODOO_PASSWORD = os.getenv("ODOO_PASSWORD")
+
+if not all([ODOO_URL, ODOO_DB, ODOO_USER, ODOO_PASSWORD]):
+    raise ValueError("Configuration is incomplete. Please verify your .env file.")
